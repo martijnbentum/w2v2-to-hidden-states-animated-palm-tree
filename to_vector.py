@@ -18,4 +18,4 @@ def audio_to_vector(audio, model=None, feature_extractor = None,
 def filename_to_vector(audio_filename, start=None, end=None, 
     model=None, feature_extractor = None, gpu = False):
     array = load.load_audio(audio_filename,start, end)
-    return audio_to_pretrained_outputs(array, model, feature_extractor, gpu)
+    return audio_to_vector(array, model, feature_extractor, gpu)
