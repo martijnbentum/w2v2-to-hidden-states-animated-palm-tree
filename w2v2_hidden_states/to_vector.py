@@ -1,4 +1,4 @@
-import load
+from . import load
 import torch
 from pathlib import Path
 

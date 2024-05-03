@@ -1,0 +1,8 @@
+ipython>=8.23.0
+librosa>=0.10.0
+progressbar2==4.2.0
+torch>=1.12.1
+transformers==4.23.1
+numpy>=1.23.3
+matplotlib==3.5.1
+itermplot>=0.3
