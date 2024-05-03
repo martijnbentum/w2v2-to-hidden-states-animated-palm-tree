@@ -8,6 +8,8 @@ from transformers import Wav2Vec2Model
 default_cache_directory='/vol/tensusers/mbentum/hidden_states/cache'
 if not os.path.exists(default_cache_directory):
     default_cache_directory = '/Users/martijn.bentum/hidden_states/cache'
+if not os.path.exists(default_cache_directory):
+    default_cache_directory = '/home/mb/hidden_states/cache'
 default_checkpoint = 'facebook/wav2vec2-xls-r-300m'
 
 def load_audio(filename, start = 0.0, end=None):
