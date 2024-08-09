@@ -63,6 +63,21 @@ def codevector_to_codebook_indices(codevector, codebook):
     codebook_indices = (index1, index2)
     return codebook_indices
 
+def multiple_codebook_indices_to_codevectors(codebook_indices, codebook):
+    if codebook is None:
+        raise ValueError('please provide codebook')
+    cv = []
+    for ci in codebook_indices:
+        cv.append(codebook_indices_to_codevector(ci, codebook))
+    return np.array(cv)
+
+def codebook_indices_to_codevector(codebook_indices, codebook):
+    if codebook is None:
+        raise ValueError('please provide codebook')
+    a = codebook[codebook_indices[0]]
+    b = codebook[codebook_indices[1]]
+    return np.hstack((a,b))
+
 
 def get_row_index_of_vector_in_matrix(vector, matrix):
     '''find the row index of a vector in a matrix'''
