@@ -1,3 +1,4 @@
+import torch
 from . import load
 
 def outputs_to_codebook_indices(outputs, model_pt):
@@ -17,7 +18,11 @@ def outputs_to_codevectors(outputs, model_pt):
     model_pt    is the Wav2Vec2ForPreTraining model which has the codebook
                 and quantizer loaded
     '''
-    codevectors, tensor = model_pt.quantizer(outputs.extract_features)
+    if type(outputs.extract_features) == np.ndarray:
+        cnn_output = torch.from_numpy(outputs.extract_features)
+    else:
+        cnn_output = outputs.extract_features
+    codevectors, tensor = model_pt.quantizer(cnn_output)
     return codevectors.detach().numpy()[0]
 
 def load_codebook(model_pt):
