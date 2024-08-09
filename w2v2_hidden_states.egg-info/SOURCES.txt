@@ -1,6 +1,7 @@
 README.md
 setup.py
 w2v2_hidden_states/__init__.py
+w2v2_hidden_states/codebook.py
 w2v2_hidden_states/connector.py
 w2v2_hidden_states/frame.py
 w2v2_hidden_states/load.py
