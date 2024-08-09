@@ -1,5 +1,6 @@
 import torch
 from . import load
+import numpy as np
 
 def outputs_to_codebook_indices(outputs, model_pt):
     '''map wav2vec2 outputs to codebook indices'''
