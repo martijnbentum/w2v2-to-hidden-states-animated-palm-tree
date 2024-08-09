@@ -4,12 +4,15 @@ import torch
 from transformers import Wav2Vec2FeatureExtractor
 from transformers import Wav2Vec2Processor
 from transformers import Wav2Vec2Model
+from transformers import Wav2Vec2ForPreTraining as pt
 
 default_cache_directory='/vol/tensusers/mbentum/hidden_states/cache'
 if not os.path.exists(default_cache_directory):
     default_cache_directory = '/Users/martijn.bentum/hidden_states/cache'
 if not os.path.exists(default_cache_directory):
     default_cache_directory = '/home/mb/hidden_states/cache'
+pretrained_small = 'facebook/wav2vec2-xls-r-300m'
+pretrained_big = 'facebook/wav2vec2-xls-r-2b'
 default_checkpoint = 'facebook/wav2vec2-xls-r-300m'
 
 def load_audio(filename, start = 0.0, end=None):
@@ -33,3 +36,9 @@ def load_pretrained_model(checkpoint = None, cache_directory = None,
         cache_dir = cache_directory)
     if gpu: model.to('cuda')
     return model
+
+def load_model_pt(checkpoint = None, gpu = False):
+    if not checkpoint: checkpoint = default_checkpoint
+    model_pt = pt.from_pretrained(default_checkpoint)
+    if gpu: model_pt.to('cuda')
+    return model_pt
