@@ -191,7 +191,6 @@ def make_frames(outputs = None, codebook_indices = None, codebook = None,
         output_n_frames = outputs.extract_features.shape[1]
     if codebook_indices:
         codebook_n_frames = len(codebook_indices)
-        print(codebook_n_frames)
     if outputs and codebook_indices:
         assert output_n_frames == codebook_n_frames
     n_frames = output_n_frames if outputs else codebook_n_frames
