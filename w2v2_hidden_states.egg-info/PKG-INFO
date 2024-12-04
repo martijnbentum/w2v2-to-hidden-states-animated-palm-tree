@@ -1,5 +1,5 @@
 Metadata-Version: 2.1
-Name: w2v2_hidden_states
+Name: w2v2-hidden-states
 Version: 0.1
 Summary: a package to handle wav2vec 2.0 hidden states outputs
 Home-page: https://github.com/martijnbentum/w2v2-to-hidden-states-animated-palm-tree
@@ -9,11 +9,3 @@ Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
-Requires-Dist: ipython>=8.23.0
-Requires-Dist: librosa>=0.10.0
-Requires-Dist: progressbar2==4.2.0
-Requires-Dist: torch>=1.12.1
-Requires-Dist: transformers==4.23.1
-Requires-Dist: numpy>=1.23.3
-Requires-Dist: matplotlib==3.5.1
-Requires-Dist: itermplot>=0.3

@@ -1,4 +1,7 @@
+import torch
 from . import load
+import numpy as np
+import torch
 
 def outputs_to_codebook_indices(outputs, model_pt):
     '''map wav2vec2 outputs to codebook indices'''
@@ -17,7 +20,11 @@ def outputs_to_codevectors(outputs, model_pt):
     model_pt    is the Wav2Vec2ForPreTraining model which has the codebook
                 and quantizer loaded
     '''
-    codevectors, tensor = model_pt.quantizer(outputs.extract_features)
+    if type(outputs.extract_features) == np.ndarray:
+        cnn_output = torch.from_numpy(outputs.extract_features)
+    else:
+        cnn_output = outputs.extract_features
+    codevectors, tensor = model_pt.quantizer(cnn_output)
     return codevectors.detach().numpy()[0]
 
 def load_codebook(model_pt):
@@ -55,6 +62,21 @@ def codevector_to_codebook_indices(codevector, codebook):
     index2 = get_row_index_of_vector_in_matrix(q2, codebook)
     codebook_indices = (index1, index2)
     return codebook_indices
+
+def multiple_codebook_indices_to_codevectors(codebook_indices, codebook):
+    if codebook is None:
+        raise ValueError('please provide codebook')
+    cv = []
+    for ci in codebook_indices:
+        cv.append(codebook_indices_to_codevector(ci, codebook))
+    return np.array(cv)
+
+def codebook_indices_to_codevector(codebook_indices, codebook):
+    if codebook is None:
+        raise ValueError('please provide codebook')
+    a = codebook[codebook_indices[0]]
+    b = codebook[codebook_indices[1]]
+    return np.hstack((a,b))
 
 
 def get_row_index_of_vector_in_matrix(vector, matrix):
