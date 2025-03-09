@@ -14,6 +14,20 @@ def load_model_pt(checkpoint = None, gpu = False):
     '''wrapper function to load the model_pt'''
     return load.load_model_pt(checkpoint, gpu)
 
+def cnn_output_to_codebook_indices(cnn_output, model_pt, codebook=None):
+    '''map cnn output to codebook indices'''
+    cnn_output = torch.from_numpy(cnn_output)
+    if len(cnn_output.shape) == 1:seq_len = 1
+    elif len(cnn_output.shape) == 2:seq_len = cnn_output.shape[0]
+    else: raise ValueError('cnn_output should be 1D or 2D')
+    cnn_output = cnn_output.view(1,seq_len,-1)
+    codevectors, tensor = model_pt.quantizer(cnn_output)
+    cv = codevectors.detach().numpy()[0]
+    if codebook is None:
+        codebook = load_codebook(model_pt)
+    ci = codevectors_to_codebook_indices(cv, codebook)
+    return ci
+
 def outputs_to_codevectors(outputs, model_pt):
     '''map cnn outputs to codevectors
     outputs     is the hidden states output of the wav2vec2 model
