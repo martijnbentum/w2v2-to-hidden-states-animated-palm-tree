@@ -5,7 +5,7 @@ import numpy as np
 class Frames:
     '''Frames class to handle the frames of the wav2vec2 outputs 
     '''
-    def __init__(self,n_frames, stride = 1/49, field = 0.025, 
+    def __init__(self,n_frames, stride = 0.02, field = 0.025, 
         start_time = 0, frames = None, identifier = '', name = '',
         audio_filename = '', outputs = None, codebook_indices = None,
         codebook = None):
@@ -173,6 +173,18 @@ def extract_info_from_outputs(outputs):
     d['outputs'] = outputs
     return d
 
+def find_frame_start_time(start_time):
+    '''find the start time of the first frame.'''
+    if abs(0 - start_time) < 0.001: return 0
+    stride = 1/49
+    end_time = start_time + 0.001
+    nframes = int(start_time / stride) + 5
+    frames = Frames(nframes, start_time =  0)
+    for i, f in enumerate(frames.frames):
+        if f.overlap(start_time, end_time): 
+            return f.start_time
+    raise ValueError('Could not find frame start time', start_time)
+
 def make_frames(outputs = None, codebook_indices = None, codebook = None,
     start_time = 0):
     '''make frames object from the outputs and or codebook indices.
@@ -193,6 +205,7 @@ def make_frames(outputs = None, codebook_indices = None, codebook = None,
         codebook_n_frames = len(codebook_indices)
     if outputs and codebook_indices:
         assert output_n_frames == codebook_n_frames
+    frame_start_time = find_frame_start_time(start_time)
     n_frames = output_n_frames if outputs else codebook_n_frames
     info = extract_info_from_outputs(outputs) if outputs else {}
     if info == {}: info['start_time'] = start_time
