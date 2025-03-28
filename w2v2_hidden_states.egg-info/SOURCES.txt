@@ -6,6 +6,7 @@ w2v2_hidden_states/connector.py
 w2v2_hidden_states/frame.py
 w2v2_hidden_states/load.py
 w2v2_hidden_states/server.py
+w2v2_hidden_states/st_phonetic_map_cnn_to_ci.py
 w2v2_hidden_states/to_vector.py
 w2v2_hidden_states/w2v_socket_receiver.py
 w2v2_hidden_states/w2v_socket_server.py

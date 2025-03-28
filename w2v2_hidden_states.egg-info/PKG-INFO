@@ -5,7 +5,12 @@ Summary: a package to handle wav2vec 2.0 hidden states outputs
 Home-page: https://github.com/martijnbentum/w2v2-to-hidden-states-animated-palm-tree
 Author: Martijn Bentum
 Author-email: martijn.bentum@.ru.nl
+License: UNKNOWN
+Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
+
+UNKNOWN
+
