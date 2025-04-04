@@ -62,6 +62,17 @@ class Frames:
                 self.transformer_none_indices.append(i)
             else:
                 self.transformer_available_indices.append(i)
+
+    def start_frame(self, start = None, end = None, percentage_overlap = None):
+        if start == end == percentage_overlap == None:
+            return select_start_frame(self.frames)
+        if start is None:
+            start = self.start_time
+        if end is None:
+            end = self.end_time
+        selected_frames = self.select_frames(start, end, 
+            percentage_overlap = percentage_overlap)
+        return select_start_frame(selected_frames)
         
     def middle_frame(self, start = None, end = None, percentage_overlap = None):
         '''Get the middle frame of the frames that overlap with the start 
@@ -76,6 +87,35 @@ class Frames:
         selected_frames = self.select_frames(start, end, 
             percentage_overlap = percentage_overlap)
         return select_middle_frame(selected_frames)
+
+    def end_frame(self, start = None, end = None, percentage_overlap = None):
+        '''Get the end frame of the frames that overlap with the start 
+        and end times
+        '''
+        if start == end == percentage_overlap == None:
+            return select_end_frame(self.frames)
+        if start is None:
+            start = self.start_time
+        if end is None:
+            end = self.end_time
+        selected_frames = self.select_frames(start, end, 
+            percentage_overlap = percentage_overlap)
+        return select_end_frame(selected_frames)
+
+    def start_middle_end_frames(self, start = None, end = None,
+        percentage_overlap = None):
+        '''Get the start, middle and end frames of the frames that overlap 
+        with the start and end times
+        '''
+        if start == end == percentage_overlap == None:
+            return select_start_middle_end_frames(self.frames)
+        if start is None:
+            start = self.start_time
+        if end is None:
+            end = self.end_time
+        selected_frames = self.select_frames(start, end, 
+            percentage_overlap = percentage_overlap)
+        return select_start_middle_end_frames(selected_frames)
 
     def select_frames(self,start = None,end = None, percentage_overlap = None):
         '''Select frames that overlap with the start and end times
@@ -348,9 +388,33 @@ def extract_hidden_states(hidden_states, start_index, end_index):
         hs.append(hidden_state[:,start_index:end_index,:])
     return hs
 
+def select_start_frame(frames):
+    n_frames = len(frames)
+    if n_frames > 0: return frames[0]
+
 def select_middle_frame(frames):
     n_frames = len(frames)
     if n_frames == 1: return frames[0]
     if n_frames % 2 == 0:
         return frames[int(n_frames / 2) - 1]
     return frames[int(n_frames / 2)]
+
+def select_end_frame(frames):
+    n_frames = len(frames)
+    if n_frames > 0: return frames[-1]
+
+def select_start_middle_end_frames(frames):
+    n_frames = len(frames)
+    d = {'start': None, 'middle': None, 'end': None}
+    if n_frames == 0: return d
+    if n_frames > 0:
+        d['start'] = select_start_frame(frames)
+    if n_frames > 1:
+        d['end'] = select_end_frame(frames)
+    if n_frames == 3:
+        d['middle'] = frames[1]
+    elif n_frames > 3:
+        d['middle'] = select_middle_frame(frames)
+    return d
+
+        
