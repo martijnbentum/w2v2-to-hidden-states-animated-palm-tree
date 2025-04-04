@@ -38,6 +38,7 @@ class Frames:
         self._make_frames()
         self.end_time = self.frames[-1].end_time 
         self.duration = self.end_time - self.frames[0].start_time
+        self._set_transformer_info()
 
     def __repr__(self):
         m = f'Frames(#frames:{self.n_frames}, start:{self.start_time:.3f}'
@@ -51,13 +52,42 @@ class Frames:
             self.frames.append(Frame(index, self.stride, self.field, 
                 self.start_time, self))
 
-    def select_frames(self,start,end, percentage_overlap = None):
+    def _set_transformer_info(self):
+        self.transformer_none_indices = []
+        self.transformer_available_indices = []
+        if self.outputs is None: return
+        if not hasattr(self.outputs,'hidden_states'): return
+        for i, hidden_state in enumerate(self.outputs.hidden_states):
+            if hidden_state is None:
+                self.transformer_none_indices.append(i)
+            else:
+                self.transformer_available_indices.append(i)
+        
+    def middle_frame(self, start = None, end = None, percentage_overlap = None):
+        '''Get the middle frame of the frames that overlap with the start 
+        and end times
+        '''
+        if start == end == percentage_overlap == None:
+            return select_middle_frame(self.frames)
+        if start is None:
+            start = self.start_time
+        if end is None:
+            end = self.end_time
+        selected_frames = self.select_frames(start, end, 
+            percentage_overlap = percentage_overlap)
+        return select_middle_frame(selected_frames)
+
+    def select_frames(self,start = None,end = None, percentage_overlap = None):
         '''Select frames that overlap with the start and end times
         start               start time
         end                 end time
         percentage_overlap  the percentage of the frame that must overlap
                             with the segment between start and end time
         '''
+        if start == end == None:
+            return self.frames
+        if start is None: start = self.start_time
+        if end is None: end = self.end_time
         selected_frames = []
         for frame in self.frames:
             if percentage_overlap == None:
@@ -67,45 +97,77 @@ class Frames:
                 selected_frames.append(frame)
         return selected_frames
 
-    def cnn(self, start_time, end_time, average = False):
+    def cnn(self, start_time = None, end_time = None, average = False, 
+        percentage_overlap = None, middle_frame = False):
         '''Get the cnn output of the frames that overlap with the start 
         and end times
         '''
-        frames = self.select_frames(start_time, end_time)
+        if middle_frame:
+            frame = self.middle_frame(start_time, end_time,
+                percentage_overlap = percentage_overlap)
+            return frame.cnn()
+        frames = self.select_frames(start_time, end_time, 
+            percentage_overlap = percentage_overlap)
+        if len(frames) == 1: return frames[0].cnn()
         output = np.array([frame.cnn() for frame in frames])
         if average:return np.mean(output,axis=0)
         return output
     
-    def feature_vector(self, start_time, end_time, average = False):
+    def feature_vector(self, start_time = None, end_time = None, 
+        average = False, percentage_overlap = None):
         '''Get the cnn output of the frames that overlap with the start 
         and end times
         '''
-        return self.cnn(start_time, end_time, average)
+        return self.cnn(start_time, end_time, average, 
+            percentage_overlap = percentage_overlap)
 
-    def transformer(self, layer, start_time, end_time, average = False):
+    def transformer(self, layer, start_time = None, end_time = None, 
+        average = False,percentage_overlap = None, middle_frame = False):
         '''Get the transformer output of the frames that overlap with the start 
         and end times
         '''
-        frames = self.select_frames(start_time, end_time)
+        if self.outputs is None: return None
+        if not hasattr(self.outputs,'hidden_states'): return None
+        if layer not in self.transformer_available_indices:
+            m = f'Layer {layer} not available in the transformer outputs\n'
+            m += f'Available layers: {self.transformer_available_indices}'
+            raise ValueError('Layer not available in the transformer outputs')
+        if middle_frame:
+            frame = self.middle_frame(start_time, end_time,
+                percentage_overlap = percentage_overlap)
+            return frame.transformer(layer)
+        frames = self.select_frames(start_time, end_time, 
+            percentage_overlap = percentage_overlap)
+        if len(frames) == 1: return frames[0].transformer(layer)
         output = np.array([frame.transformer(layer) for frame in frames])
         if average:return np.mean(output,axis=0)
         return output
 
-    def codebook_indices(self, start_time, end_time):
+    def codebook_indices(self, start_time, end_time, percentage_overlap = None,
+        middle_frame = False):
         '''Get the codebook indices of the frames that overlap with the start
         and end times
         codebook indices are indices in the codebook with quantized 
         representation of the cnn output
         '''
-        frames = self.select_frames(start_time, end_time)
+        if middle_frame:
+            frame = self.middle_frame(start_time, end_time,
+                percentage_overlap = percentage_overlap)
+            return frame.codebook_indices()
+        frames = self.select_frames(start_time, end_time, 
+            percentage_overlap = percentage_overlap)
+        if len(frames) == 1: return frames[0].codebook_indices()
         ci = np.array([frame.codebook_indices() for frame in frames])
         return ci
 
-    def codevectors(self, start_time, end_time):
+    def codevectors(self, start_time, end_time, percentage_overlap = None,
+        middle_frame = False):
         '''Get the codevectors of the frames that overlap with the start
         and end times
         '''
-        codebook_indices = self.codebook_indices(start_time, end_time)
+        codebook_indices = self.codebook_indices(start_time, end_time,
+            percentage_overlap = percentage_overlap, 
+            middle_frame = middle_frame)
         return codebook.multiple_codebook_indices_to_codevectors(
             codebook_indices, self.codebook)
 
@@ -286,3 +348,9 @@ def extract_hidden_states(hidden_states, start_index, end_index):
         hs.append(hidden_state[:,start_index:end_index,:])
     return hs
 
+def select_middle_frame(frames):
+    n_frames = len(frames)
+    if n_frames == 1: return frames[0]
+    if n_frames % 2 == 0:
+        return frames[int(n_frames / 2) - 1]
+    return frames[int(n_frames / 2)]
