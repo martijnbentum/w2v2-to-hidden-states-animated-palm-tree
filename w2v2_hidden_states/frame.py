@@ -67,45 +67,53 @@ class Frames:
                 selected_frames.append(frame)
         return selected_frames
 
-    def cnn(self, start_time, end_time, average = False):
+    def cnn(self, start_time, end_time, average = False, 
+        percentage_overlap = None):
         '''Get the cnn output of the frames that overlap with the start 
         and end times
         '''
-        frames = self.select_frames(start_time, end_time)
+        frames = self.select_frames(start_time, end_time, 
+            percentage_overlap = percentage_overlap)
         output = np.array([frame.cnn() for frame in frames])
         if average:return np.mean(output,axis=0)
         return output
     
-    def feature_vector(self, start_time, end_time, average = False):
+    def feature_vector(self, start_time, end_time, average = False,
+        percentage_overlap = None):
         '''Get the cnn output of the frames that overlap with the start 
         and end times
         '''
-        return self.cnn(start_time, end_time, average)
+        return self.cnn(start_time, end_time, average, 
+            percentage_overlap = percentage_overlap)
 
-    def transformer(self, layer, start_time, end_time, average = False):
+    def transformer(self, layer, start_time, end_time, average = False,
+        percentage_overlap = None):
         '''Get the transformer output of the frames that overlap with the start 
         and end times
         '''
-        frames = self.select_frames(start_time, end_time)
+        frames = self.select_frames(start_time, end_time, 
+        percentage_overlap = percentage_overlap)
         output = np.array([frame.transformer(layer) for frame in frames])
         if average:return np.mean(output,axis=0)
         return output
 
-    def codebook_indices(self, start_time, end_time):
+    def codebook_indices(self, start_time, end_time, percentage_overlap = None):
         '''Get the codebook indices of the frames that overlap with the start
         and end times
         codebook indices are indices in the codebook with quantized 
         representation of the cnn output
         '''
-        frames = self.select_frames(start_time, end_time)
+        frames = self.select_frames(start_time, end_time, 
+            percentage_overlap = percentage_overlap)
         ci = np.array([frame.codebook_indices() for frame in frames])
         return ci
 
-    def codevectors(self, start_time, end_time):
+    def codevectors(self, start_time, end_time, percentage_overlap = None):
         '''Get the codevectors of the frames that overlap with the start
         and end times
         '''
-        codebook_indices = self.codebook_indices(start_time, end_time)
+        codebook_indices = self.codebook_indices(start_time, end_time,
+            percentage_overlap = percentage_overlap)
         return codebook.multiple_codebook_indices_to_codevectors(
             codebook_indices, self.codebook)
 
