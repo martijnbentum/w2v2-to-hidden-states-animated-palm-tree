@@ -278,7 +278,7 @@ def extract_info_from_outputs(outputs):
 def find_frame_start_time(start_time):
     '''find the start time of the first frame.'''
     if abs(0 - start_time) < 0.001: return 0
-    stride = 1/49
+    stride = 0.02
     end_time = start_time + 0.001
     nframes = int(start_time / stride) + 5
     frames = Frames(nframes, start_time =  0)
