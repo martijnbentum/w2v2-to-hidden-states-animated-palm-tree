@@ -42,7 +42,7 @@ def load_pretrained_model(checkpoint = None, cache_directory = None,
 
 def load_model_pt(checkpoint = None, gpu = False):
     if not checkpoint: checkpoint = default_checkpoint
-    model_pt = pt.from_pretrained(default_checkpoint)
+    model_pt = pt.from_pretrained(checkpoint)
     if gpu: model_pt.to('cuda')
     return model_pt
 
