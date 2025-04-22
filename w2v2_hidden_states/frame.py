@@ -310,7 +310,7 @@ def make_frames(outputs = None, codebook_indices = None, codebook = None,
     frame_start_time = find_frame_start_time(start_time)
     n_frames = output_n_frames if outputs else codebook_n_frames
     info = extract_info_from_outputs(outputs) if outputs else {}
-    if info == {}: info['start_time'] = start_time
+    if info == {}: info['start_time'] = frame_start_time
     frames = Frames(n_frames, codebook_indices = codebook_indices,
         codebook = codebook, **info)
     return frames
