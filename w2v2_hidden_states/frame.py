@@ -201,15 +201,18 @@ class Frames:
         return ci
 
     def codevectors(self, start_time, end_time, percentage_overlap = None,
-        middle_frame = False):
+        middle_frame = False, average = False):
         '''Get the codevectors of the frames that overlap with the start
         and end times
         '''
         codebook_indices = self.codebook_indices(start_time, end_time,
             percentage_overlap = percentage_overlap, 
             middle_frame = middle_frame)
-        return codebook.multiple_codebook_indices_to_codevectors(
+        codevectors= codebook.multiple_codebook_indices_to_codevectors(
             codebook_indices, self.codebook)
+        if average:
+            return np.mean(codevectors, axis=0)
+        return codevectors
 
 
 class Frame:
